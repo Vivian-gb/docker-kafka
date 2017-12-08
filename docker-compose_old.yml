@@ -1,0 +1,29 @@
+version: '3'
+networks:
+  rede:
+    # Use a custom driver
+    driver: bridge
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    volumes:
+      - /C/Tools/dockers/logs/zookeeper:/logs
+      - /C/Tools/dockers/data/zookeeper:/data
+    networks:
+      - rede
+  kafka:
+    build: .
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 10.0.75.1
+      KAFKA_CREATE_TOPICS: "fila:1:1:compact"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LOG_DIRS: "kafka-logs-NODE1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /C/Tools/dockers/data/kafka:/kafka
+    networks:
+      - rede
